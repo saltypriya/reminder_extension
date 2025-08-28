@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Reminder Extension</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            width: 380px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #6c5ce7;
+            font-size: 26px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #2d3436;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #a29bfe;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.2);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-inputs select {
+            flex: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(108, 92, 231, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .reminders-list {
+            margin-top: 25px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .reminders-list h3 {
+            color: #6c5ce7;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f2f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reminder-item {
+            background: #f8f9fa;
+            border-left: 4px solid #a29bfe;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.5s;
+            position: relative;
+        }
+
+        .reminder-item h4 {
+            color: #2d3436;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .reminder-item p {
+            color: #636e72;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .reminder-time {
+            color: #6c5ce7;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff7675;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+            background: #ff5e57;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #636e72;
+        }
+
+        .empty-state p {
+            margin-bottom: 15px;
+        }
+
+        .notification-preview {
+            background: #dfe6e9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #00cec9;
+        }
+
+        .notification-preview h4 {
+            color: #2d3436;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-preview p {
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cute-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #a29bfe, transparent);
+            margin: 20px 0;
+            border: none;
+        }
+
+        .theme-color {
+            color: #6c5ce7;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f2f6;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a29bfe;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6c5ce7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span>⏰</span> Cute Reminder</h1>
+        <p>Set reminders and get notified directly in your browser</p>
+    </div>
+
+    <div class="container">
+        <div class="form-group">
+            <label for="reminder-title">Reminder Title</label>
+            <input type="text" id="reminder-title" placeholder="e.g., Drink water">
+        </div>
+
+        <div class="form-group">
+            <label for="reminder-message">Message</label>
+            <textarea id="reminder-message" placeholder="e.g., Time to hydrate! 💧"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="reminder-time">When to remind you?</label>
+            <div class="time-inputs">
+                <select id="time-value">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="30">30</option>
+                    <option value="60">60</option>
+                </select>
+                <select id="time-unit">
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn" id="set-reminder">
+            <span>💖</span> Set Reminder
+        </button>
+
+        <hr class="cute-divider">
+
+        <div class="reminders-list">
+            <h3><span>📋</span> Your Reminders</h3>
+            <div id="reminders-container">
+                <div class="empty-state">
+                    <p>No reminders set yet</p>
+                    <small>Your reminders will appear here</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-preview">
+            <h4><span>🔔</span> Notification Preview</h4>
+            <p>This is how your reminder will appear</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const setReminderBtn = document.getElementById('set-reminder');
+            const reminderTitle = document.getElementById('reminder-title');
+            const reminderMessage = document.getElementById('reminder-message');
+            const timeValue = document.getElementById('time-value');
+            const timeUnit = document.getElementById('time-unit');
+            const remindersContainer = document.getElementById('reminders-container');
+            
+            // Sample reminders for demo
+            const sampleReminders = [
+                {
+                    title: 'Drink water',
+                    message: 'Stay hydrated! 💧',
+                    time: '10 minutes'
+                },
+                {
+                    title: 'Take a break',
+                    message: 'Rest your eyes 👀',
+                    time: '30 minutes'
+                }
+            ];
+            
+            // Load sample reminders for demo
+            loadSampleReminders();
+            
+            setReminderBtn.addEventListener('click', function() {
+                const title = reminderTitle.value.trim();
+                const message = reminderMessage.value.trim();
+                const time = `${timeValue.value} ${timeUnit.value}`;
+                
+                if (!title || !message) {
+                    showNotification('Please add both title and message!', 'error');
+                    return;
+                }
+                
+                // Add new reminder
+                addReminder(title, message, time);
+                
+                // Clear form
+                reminderTitle.value = '';
+                reminderMessage.value = '';
+                
+                // Show success message
+                showNotification('Reminder set successfully!', 'success');
+            });
+            
+            function addReminder(title, message, time) {
+                const reminderElement = document.createElement('div');
+                reminderElement.className = 'reminder-item';
+                
+                reminderElement.innerHTML = `
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                    <div class="reminder-time">
+                        <span>⏰</span> ${time}
+                    </div>
+                    <div class="delete-btn">×</div>
+                `;
+                
+                // Add delete functionality
+                const deleteBtn = reminderElement.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function() {
+                    reminderElement.remove();
+                    updateEmptyState();
+                    showNotification('Reminder deleted', 'info');
+                });
+                
+                // Remove empty state if it exists
+                const emptyState = remindersContainer.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                
+                remindersContainer.appendChild(reminderElement);
+            }
+            
+            function loadSampleReminders() {
+                sampleReminders.forEach(reminder => {
+                    addReminder(reminder.title, reminder.message, reminder.time);
+                });
+            }
+            
+            function updateEmptyState() {
+                if (remindersContainer.children.length === 0) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerHTML = `
+                        <p>No reminders set yet</p>
+                        <small>Your reminders will appear here</small>
+                    `;
+                    remindersContainer.appendChild(emptyState);
+                }
+            }
+            
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                // Style the notification based on type
+                notification.style.position = 'fixed';
+                notification.style.bottom = '20px';
+                notification.style.right = '20px';
+                notification.style.padding = '12px 20px';
+                notification.style.borderRadius = '8px';
+                notification.style.color = 'white';
+                notification.style.fontWeight = '500';
+                notification.style.zIndex = '1000';
+                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                notification.style.animation = 'fadeIn 0.3s';
+                
+                if (type === 'success') {
+                    notification.style.background = 'linear-gradient(135deg, #00b894 0%, #55efc4 100%)';
+                } else if (type === 'error') {
+                    notification.style.background = 'linear-gradient(135deg, #ff7675 0%, #fab1a0 100%)';
+                } else {
+                    notification.style.background = 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)';
+                }
+                
+                // Add to body
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 500);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
